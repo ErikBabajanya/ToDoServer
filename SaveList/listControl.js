@@ -29,6 +29,7 @@ const getList = async (req, res) => {
         item.archive = true;
       }
     });
+
     res.status(200).json(list);
   } catch (error) {
     console.log(error);
