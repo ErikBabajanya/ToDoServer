@@ -37,4 +37,55 @@ const getList = async (req, res) => {
   }
 };
 
-module.exports = { createList, getList };
+const deleteList = async (req, res) => {
+  const { _id } = req.body;
+  console.log(_id);
+  try {
+    const deletedItem = await ListModel.findByIdAndDelete(_id);
+    if (!deletedItem) {
+      return res.status(404).json({ message: "Item not found" });
+    }
+    res.json({ message: "Item deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+const clearCompleted = async (req, res) => {
+  const { completedIds } = req.body;
+
+  try {
+    const result = await ListModel.deleteMany({ _id: { $in: completedIds } });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ message: "No items found for deletion" });
+    }
+
+    res.json({ message: "Completed items deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+const editList = async (req, res) => {
+  const { itemId, newText } = req.body;
+
+  try {
+    const updatedItem = await ListModel.findByIdAndUpdate(itemId, {
+      text: newText,
+    });
+
+    if (!updatedItem) {
+      return res.status(404).json({ message: "Item not found" });
+    }
+
+    res.json({ message: "Item updated successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+module.exports = { createList, getList, deleteList, clearCompleted, editList };
